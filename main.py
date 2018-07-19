@@ -107,7 +107,7 @@ img_noise = np.random.uniform(size=(244, 244, 3)) + 100.0
 
 
 def showarray(a, fmt='jpeg'):
-    a = np.unit8(np.clip(a, 0, 1) * 255)
+    a = np.uint8(np.clip(a, 0, 1) * 255)
     f = BytesIO()
     PIL.Image.fromarray(a).save(f, fmt)
     display(Image(data=f.getvalue()))
@@ -119,6 +119,7 @@ def visstd(a, s=0.1):
 
 def T(layer):
     return graph.get_tensor_by_name("import/%s:0"%layer)
+
 
 def render_native(t_obj, img0=img_noise, iter_n=20, step=1.0):
     t_score = tf.reduce_mean(t_obj)
