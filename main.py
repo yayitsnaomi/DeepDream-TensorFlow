@@ -98,3 +98,39 @@ def show_graph(graph_def, max_const_size=32):
 tmp_def = rename_nodes(graph_def, lambda s: "/".join(s.split('_', 1)))
 show_graph(tmp_def)
 
+
+# Picking some internal layer. Note that we use outputs before applying the ReLU nonlinearity
+# to have non-zero gradients for features with negative initial activations.
+layer = 'mixed4d_3x3_bottleneck_pre_relu'
+channel = 139
+img_noise = np.random.uniform(size=(244, 244, 3)) + 100.0
+
+
+def showarray(a, fmt='jpeg'):
+    a = np.unit8(np.clip(a, 0, 1) * 255)
+    f = BytesIO()
+    PIL.Image.fromarray(a).save(f, fmt)
+    display(Image(data=f.getvalue()))
+
+
+def visstd(a, s=0.1):
+    return (a - a.mean()) / max(a.std(), 1e-4) * s + 0.5
+
+
+def T(layer):
+    return graph.get_tensor_by_name("import/%s:0"%layer)
+
+def render_native(t_obj, img0=img_noise, iter_n=20, step=1.0):
+    t_score = tf.reduce_mean(t_obj)
+    t_grad = tf.gradients(t_score, t_input)[0]
+
+    img = img0.copy()
+    for i in range(iter_n):
+        g, score = sess.run([t_grad, t_score], {t_input:img})
+        g /= g.std() + 1e-8
+        img += g*step
+        print(score, end=' ')
+    clear_output()
+    showarray(visstd(img))
+
+render_native(T(layer)[:, :, :, channel])
