@@ -85,7 +85,7 @@ def show_graph(graph_def, max_const_size=32):
         <div style="height:600px">
           <tf-graph-basic id="{id}"></tf-graph-basic>
         </div>
-    """.format(data=repr(str(strip_def)), id='graph'+str(np.random.rand()))
+        """.format(data=repr(str(strip_def)), id='graph'+str(np.random.rand()))
 
     iframe = """
         <iframe seamless style="width:800px;height:620px;border:0" srcdoc="{}"></iframe>
@@ -195,11 +195,11 @@ render_multiscale(T(layer)[:, :, :, channel])
 
 k = np.float32([1,4,6,4,1])
 k = np.outer(k, k)
-k5x5 = k[:,:,None,None]/k.sum()*np.eye(3, dtype=np.float32)
+k5x5 = k[:, :, None, None]/k.sum()*np.eye(3, dtype=np.float32)
 
 
 def lap_split(img):
-    '''Split the image into lo and hi frequency components'''
+    """Split the image into lo and hi frequency components"""
     with tf.name_scope('split'):
         lo = tf.nn.conv2d(img, k5x5, [1,2,2,1], 'SAME')
         lo2 = tf.nn.conv2d_transpose(lo, k5x5*4, tf.shape(img), [1,2,2,1])
@@ -208,7 +208,7 @@ def lap_split(img):
 
 
 def lap_split_n(img, n):
-    '''Build Laplacian pyramid with n splits'''
+    """Build Laplacian pyramid with n splits"""
     levels = []
     for i in range(n):
         img, hi = lap_split(img)
@@ -218,7 +218,7 @@ def lap_split_n(img, n):
 
 
 def lap_merge(levels):
-    '''Merge Laplacian pyramid'''
+    """Merge Laplacian pyramid"""
     img = levels[0]
     for hi in levels[1:]:
         with tf.name_scope('merge'):
@@ -227,14 +227,14 @@ def lap_merge(levels):
 
 
 def normalize_std(img, eps=1e-10):
-    '''Normalize image by making its standard deviation = 1.0'''
+    """Normalize image by making its standard deviation = 1.0"""
     with tf.name_scope('normalize'):
         std = tf.sqrt(tf.reduce_mean(tf.square(img)))
         return img/tf.maximum(std, eps)
 
 
 def lap_normalize(img, scale_n=4):
-    '''Perform the Laplacian pyramid normalization.'''
+    """Perform the Laplacian pyramid normalization."""
     img = tf.expand_dims(img,0)
     tlevels = lap_split_n(img, scale_n)
     tlevels = list(map(normalize_std, tlevels))
@@ -276,6 +276,7 @@ def render_lapnorm(t_obj, img0=img_noise, visfunc=visstd,
 # render_lapnorm(T('mixed3b_1x1_pre_relu')[:,:,:,101])
 
 # render_lapnorm(T(layer)[:,:,:,65]+T(layer)[:,:,:,139], octave_n=4)
+
 
 """
     GOOGLE DEEP DREAM ALGORYTHM
