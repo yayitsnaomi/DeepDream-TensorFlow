@@ -134,4 +134,61 @@ def render_native(t_obj, img0=img_noise, iter_n=20, step=1.0):
     clear_output()
     showarray(visstd(img))
 
+
 render_native(T(layer)[:, :, :, channel])
+
+
+def tffunc(*argtypes):
+    placeholders = list(map(tf.placeholder, argtypes))
+
+    def wrap(f):
+        out = f(*placeholders)
+
+        def wrapper(*args, **kw):
+            return out.eval(dict(zip(placeholders, args)), session=kw.get('session'))
+        return wrapper
+    return wrap
+
+
+# Helper function that uses TF to resize an image
+def resize(img, size):
+    img = tf.expand_dims(img, 0)
+    return tf.image.resize_bilinear(img, size)[0,:,:,:]
+
+
+resize = tffunc(np.float32, np.int32)(resize)
+
+
+def calc_grad_tiled(img, t_grad, tile_size=512):
+    sz = tile_size
+    h, w = img.shape[:2]
+    sx, sy = np.random.randint(sz, size=2)
+    img_shift = np.roll(np.roll(img, sx, 1), sy, 0)
+    grad = np.zeros_like(img)
+    for y in range(0, max(h-sz//2, sz),sz):
+        for x in range(0, max(w-sz//2, sz),sz):
+            sub = img_shift[y:y+sz,x:x+sz]
+            g = sess.run(t_grad, {t_input:sub})
+            grad[y:y+sz,x:x+sz] = g
+    return np.roll(np.roll(grad, -sx, 1), -sy, 0)
+
+
+def render_multiscale(t_obj, img0=img_noise, iter_n=10, step=1.0, octave_n=3, octave_scale=1.4):
+    t_score = tf.reduce_mean(t_obj)
+    t_grad = tf.gradients(t_score, t_input)[0]
+
+    img = img0.copy()
+    for octave in range(octave_n):
+        if octave > 0:
+            hw = np.float32(img.shape[:2]) * octave_scale
+            img = resize(img, np.int32(hw))
+        for i in range(iter_n):
+            g = calc_grad_tiled(img, t_grad)
+            g /= g.std() + 1e-8
+            img += g * step
+            print('.', end=' ')
+        clear_output()
+        showarray(visstd(img))
+
+
+render_multiscale(T(layer)[:, :, :, channel])
