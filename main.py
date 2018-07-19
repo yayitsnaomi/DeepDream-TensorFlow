@@ -252,9 +252,8 @@ show_graph(lap_graph)
 
 def render_lapnorm(t_obj, img0=img_noise, visfunc=visstd,
                    iter_n=10, step=1.0, octave_n=3, octave_scale=1.4, lap_n=4):
-    t_score = tf.reduce_mean(t_obj) # defining the optimization objective
-    t_grad = tf.gradients(t_score, t_input)[0] # behold the power of automatic differentiation!
-    # build the laplacian normalization graph
+    t_score = tf.reduce_mean(t_obj)
+    t_grad = tf.gradients(t_score, t_input)[0]
     lap_norm_func = tffunc(np.float32)(partial(lap_normalize, scale_n=lap_n))
 
     img = img0.copy()
