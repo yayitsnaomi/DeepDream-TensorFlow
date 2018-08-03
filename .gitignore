@@ -3,3 +3,4 @@ venv/
 __pycache__
 .pycharm
 .DS_Store
+generated/*.jpg

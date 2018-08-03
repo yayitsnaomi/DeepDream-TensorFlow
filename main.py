@@ -10,6 +10,7 @@ import json
 import os
 import warnings
 import backtrace
+import time
 
 from io import BytesIO, StringIO
 import inception5h as inception5h
@@ -185,7 +186,10 @@ def generate_deep_dream(imgPath):
                      num_iterations=10, step_size=3.0, rescale_factor=0.7,
                      num_repeats=4, blend=0.2)
 
-    save_image(img_result, './generated/generated.jpg')
+    ts = int(time.time())
+    generated_filename = './generated/' + str(ts) +'-generated.jpg'
+    os.rename(imagePath, './generated/' + str(ts) +'-original.jpg')
+    save_image(img_result, generated_filename)
 
 
 def logger(log):
