@@ -31,8 +31,8 @@ Arguments:
 | Argument    | Values                              | Default              |
 |-------------|-------------------------------------|----------------------|
 | imagePath   | String: Relative path of your image | ./demoimgs/demo.jpeg |
-| tensorLayer | Int(1,9)                            | 5                    |
-| tensorModel | Int(1,255)                          | 123                  |
+| tensorLayer | Int(1,9)                            | 6                    |
+| tensorModel | Int(1,511)                          | 123                  |
 
 # 📜 License
 
