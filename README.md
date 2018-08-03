@@ -4,6 +4,8 @@ This is a simple implementation of **Google DeepDream** with **TensorFlow**.
 
 Nothing new, but pretty fun :)
 
+<img src="./demoimgs/docimg.jpg" >
+
 # 📦 Installation
 
 Clone this project
