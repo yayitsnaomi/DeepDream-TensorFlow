@@ -185,7 +185,7 @@ def generate_deep_dream(imgPath):
                      num_iterations=10, step_size=3.0, rescale_factor=0.7,
                      num_repeats=4, blend=0.2)
 
-    save_image(img_result, './demoimgs/generated.jpg')
+    save_image(img_result, './generated/generated.jpg')
 
 
 def logger(log):

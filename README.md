@@ -4,7 +4,7 @@ This is a simple implementation of **Google DeepDream** with **TensorFlow**.
 
 Nothing new, but pretty fun :)
 
-# Installation
+# 📦 Installation
 
 Clone this project
 
@@ -32,6 +32,6 @@ Arguments:
 | tensorLayer | Int(1,9)                            | 5                    |
 | tensorModel | Int(1,255)                          | 123                  |
 
-# License
+# 📜 License
 
 [MIT](LICENSE.md)
