@@ -112,7 +112,7 @@ def tiled_gradient(gradient, image, tile_size=400):
 
 def optimize_image(layer_tensor, image,
                    num_iterations=10, step_size=3.0, tile_size=400,
-                   show_gradient=False):
+                   show_gradient=True):
 
     img = image.copy()
     gradient = model.get_gradient(layer_tensor)
@@ -121,7 +121,7 @@ def optimize_image(layer_tensor, image,
         logger({'task': 'optimizer_single_iteration', 'log': i})
 
         grad = tiled_gradient(gradient=gradient, image=img)
-        sigma = (i * 4.0) / num_iterations + 0.5
+        sigma = (i * 4.0) / num_iterations + 2.5
         grad_smooth1 = gaussian_filter(grad, sigma=sigma)
         grad_smooth2 = gaussian_filter(grad, sigma=sigma * 2)
         grad_smooth3 = gaussian_filter(grad, sigma=sigma * 0.5)
@@ -183,12 +183,12 @@ def generate_deep_dream(imgPath):
     layer_tensor = model.layer_tensors[tensorLayer][:, :, :, tensorModel]
 
     img_result = recursive_optimize(layer_tensor=layer_tensor, image=loaded_img,
-                     num_iterations=9, step_size=5.0, rescale_factor=0.7,
-                     num_repeats=4, blend=0.5, tile_size=1000)
+                     num_iterations=25, step_size=5.5, rescale_factor=0.7,
+                     num_repeats=10, blend=0.5, tile_size=1000)
 
     ts = int(time.time())
-    generated_filename = './generated/' + str(ts) +'-generated.jpg'
-    os.rename(imagePath, './generated/' + str(ts) +'-original.jpg')
+    generated_filename = './generated/' + str(ts) + '-generated.jpg'
+    os.rename(imagePath, './generated/' + str(ts) + '-original.jpg')
     save_image(img_result, generated_filename)
 
 
@@ -196,14 +196,28 @@ def logger(log):
     print(json.dumps(log))
     sys.stdout.flush()
 
+
+def performance(millis):
+    millis = int(millis)
+    seconds=(millis/1000)%60
+    seconds = int(seconds)
+    minutes=(millis/(1000*60))%60
+    minutes = int(minutes)
+    hours=(millis/(1000*60*60))%24
+
+    return ("%d:%d:%d" % (hours, minutes, seconds))
+
 """
 INITIALIZE PROCESS
 """
 
 logger({'task': 'start', 'log': 'Starting deepdream'})
 
+start_time = time.time()
 """ GENERATE DEEPDREAM """
 generate_deep_dream(imagePath)
 
+millis = (time.time() - start_time)
+
 """ SEND CALLBACK """
-logger({'task': 'exit', 'log': 'Deepdream generated'})
+logger({'task': 'exit', 'performance': performance(millis)})
